@@ -1,0 +1,1275 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+<title>死亡フラグ建築検定 - 一級フラグ建築士を目指せ</title>
+<meta name="description" content="絶体絶命のシチュエーションで最高のセリフを放ち、芸術的な死亡フラグを建立せよ！あなたのフラグ建築士ランクを全7段階で精密判定。">
+<meta name="theme-color" content="#0d0f14">
+
+<!-- OGP / Twitter Card (GitHub Pages 対応) -->
+<meta property="og:title" content="⚠️ 死亡フラグ建築検定 ⚠️">
+<meta property="og:description" content="絶体絶命のシチュエーションであなたが放つセリフは！？あなたの死亡フラグ建築士ランクを診断！">
+<meta property="og:type" content="website">
+<meta name="twitter:card" content="summary_large_image">
+<meta name="twitter:title" content="死亡フラグ建築検定">
+<meta name="twitter:description" content="どんな窮地でも芸術的な死亡フラグを建てられるか？あなたの建築士ランクを判定！">
+
+<style>
+  :root {
+    --bg-page: #0a0c10;
+    --bg-card: #141822;
+    --bg-surface: #1d2331;
+    --bg-choice: #232b3c;
+    --bg-choice-hover: #2f3a52;
+    --border-color: #344059;
+    --accent-red: #ff3355;
+    --accent-gold: #ffb82e;
+    --accent-gold-glow: rgba(255, 184, 46, 0.4);
+    --text-main: #ffffff;
+    --text-body: #e2e8f0;
+    --text-muted: #8e9bb0;
+  }
+
+  * { margin: 0; padding: 0; box-sizing: border-box; -webkit-tap-highlight-color: transparent; }
+
+  body {
+    font-family: "Hiragino Kaku Gothic ProN", "Noto Sans JP", -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+    background-color: var(--bg-page);
+    color: var(--text-body);
+    min-height: 100vh;
+    padding: 12px;
+    line-height: 1.6;
+    display: flex;
+    justify-content: center;
+    align-items: flex-start;
+    overflow-x: hidden;
+  }
+
+  /* 背景の薄いグリッド工事現場風 */
+  body::before {
+    content: "";
+    position: fixed;
+    top: 0; left: 0; right: 0; bottom: 0;
+    background-image: 
+      linear-gradient(rgba(255, 255, 255, 0.02) 1px, transparent 1px),
+      linear-gradient(90deg, rgba(255, 255, 255, 0.02) 1px, transparent 1px);
+    background-size: 32px 32px;
+    pointer-events: none;
+    z-index: 0;
+  }
+
+  /* 上部ヘッダー（サウンドトグル） */
+  .top-controls {
+    display: flex;
+    justify-content: flex-end;
+    width: 100%;
+    max-width: 660px;
+    margin: 4px auto 8px;
+    position: relative;
+    z-index: 10;
+  }
+
+  .sound-btn {
+    background: rgba(22, 27, 38, 0.9);
+    border: 1px solid var(--border-color);
+    border-radius: 20px;
+    color: var(--text-muted);
+    font-size: 0.8rem;
+    font-weight: 700;
+    padding: 5px 14px;
+    cursor: pointer;
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    transition: all 0.2s ease;
+  }
+  .sound-btn:hover {
+    border-color: var(--accent-gold);
+    color: #fff;
+  }
+  .sound-btn.on {
+    color: var(--accent-gold);
+    border-color: var(--accent-gold);
+  }
+
+  /* メインコンテナ */
+  .main-wrapper {
+    width: 100%;
+    max-width: 660px;
+    margin: 0 auto 30px;
+    background: var(--bg-card);
+    border: 1.5px solid var(--border-color);
+    border-radius: 16px;
+    box-shadow: 0 16px 50px rgba(0, 0, 0, 0.7);
+    overflow: hidden;
+    position: relative;
+    z-index: 1;
+    backdrop-filter: blur(10px);
+  }
+
+  /* 上部の工事警戒ライン */
+  .hazard-bar {
+    height: 9px;
+    background: repeating-linear-gradient(
+      -45deg,
+      #ffb82e,
+      #ffb82e 14px,
+      #141822 14px,
+      #141822 28px
+    );
+  }
+
+  .inner-content {
+    padding: 24px 20px 32px;
+  }
+
+  /* タイトル部 */
+  .badge-org {
+    display: inline-block;
+    background: rgba(255, 184, 46, 0.12);
+    border: 1px solid var(--accent-gold);
+    color: var(--accent-gold);
+    font-size: 0.78rem;
+    font-weight: 800;
+    padding: 3px 12px;
+    border-radius: 16px;
+    letter-spacing: 0.08em;
+    margin-bottom: 12px;
+  }
+
+  h1 {
+    font-size: 1.85rem;
+    font-weight: 900;
+    text-align: center;
+    color: var(--text-main);
+    letter-spacing: 0.04em;
+    margin-bottom: 6px;
+    text-shadow: 0 2px 10px rgba(0,0,0,0.5);
+  }
+
+  .subtitle {
+    text-align: center;
+    font-size: 0.92rem;
+    color: var(--text-muted);
+    margin-bottom: 22px;
+  }
+
+  /* プログレスバー */
+  .progress-section {
+    margin-bottom: 20px;
+  }
+  .progress-label {
+    display: flex;
+    justify-content: space-between;
+    font-size: 0.82rem;
+    color: var(--text-muted);
+    margin-bottom: 6px;
+    font-weight: 800;
+  }
+  .progress-track {
+    height: 8px;
+    background: #0d1017;
+    border-radius: 4px;
+    overflow: hidden;
+    border: 1px solid #283042;
+  }
+  .progress-fill {
+    height: 100%;
+    background: linear-gradient(90deg, #ff9436, #ff3355);
+    width: 0%;
+    transition: width 0.35s cubic-bezier(0.2, 0.8, 0.2, 1);
+    box-shadow: 0 0 10px rgba(255, 51, 85, 0.6);
+  }
+
+  /* 設問コンテナのアニメーション */
+  .question-wrapper {
+    animation: slideIn 0.35s cubic-bezier(0.16, 1, 0.3, 1);
+  }
+  @keyframes slideIn {
+    from { opacity: 0; transform: translateX(20px); }
+    to { opacity: 1; transform: translateX(0); }
+  }
+
+  /* 状況説明カード */
+  .situation-box {
+    background: var(--bg-surface);
+    border: 1px solid var(--border-color);
+    border-radius: 12px;
+    padding: 18px;
+    margin-bottom: 18px;
+    box-shadow: 0 4px 20px rgba(0, 0, 0, 0.25);
+  }
+  .situation-tag {
+    display: inline-block;
+    font-size: 0.78rem;
+    font-weight: 800;
+    color: var(--accent-gold);
+    background: rgba(255, 184, 46, 0.12);
+    border: 1px solid rgba(255, 184, 46, 0.3);
+    padding: 2px 9px;
+    border-radius: 4px;
+    margin-bottom: 8px;
+  }
+  .situation-title {
+    font-size: 1.15rem;
+    font-weight: 800;
+    color: var(--text-main);
+    margin-bottom: 8px;
+  }
+  .situation-text {
+    font-size: 0.98rem;
+    color: var(--text-body);
+    line-height: 1.65;
+  }
+  .prompt-call {
+    margin-top: 14px;
+    padding: 10px 14px;
+    background: rgba(255, 51, 85, 0.12);
+    border-left: 4px solid var(--accent-red);
+    border-radius: 0 8px 8px 0;
+    font-size: 0.95rem;
+    font-weight: 800;
+    color: #ff94a6;
+  }
+
+  /* 選択肢ボタン */
+  .choices-container {
+    display: flex;
+    flex-direction: column;
+    gap: 11px;
+  }
+
+  .choice-btn {
+    background: var(--bg-choice);
+    border: 1.5px solid var(--border-color);
+    border-radius: 10px;
+    padding: 15px 18px;
+    color: var(--text-main);
+    cursor: pointer;
+    text-align: left;
+    font-size: 1rem;
+    font-weight: 700;
+    line-height: 1.5;
+    transition: all 0.15s cubic-bezier(0.2, 0.8, 0.2, 1);
+    outline: none;
+    display: block;
+    width: 100%;
+    position: relative;
+    overflow: hidden;
+  }
+
+  .choice-btn:hover:not(:disabled) {
+    background: var(--bg-choice-hover);
+    border-color: var(--accent-red);
+    transform: translateY(-2px);
+    box-shadow: 0 6px 16px rgba(255, 51, 85, 0.2);
+  }
+
+  .choice-btn:active:not(:disabled) {
+    transform: scale(0.98);
+  }
+
+  .choice-btn.selected {
+    background: #401420 !important;
+    border-color: var(--accent-red) !important;
+    color: #ffffff !important;
+    box-shadow: 0 0 20px rgba(255, 51, 85, 0.4);
+    animation: punchImpact 0.25s ease-out;
+  }
+
+  @keyframes punchImpact {
+    0% { transform: scale(1); }
+    50% { transform: scale(0.96); }
+    100% { transform: scale(1); }
+  }
+
+  /* スタート画面 */
+  .start-view {
+    text-align: center;
+    padding: 10px 4px;
+  }
+  .intro-card {
+    background: var(--bg-surface);
+    border: 1px solid var(--border-color);
+    border-radius: 12px;
+    padding: 22px 20px;
+    margin-bottom: 26px;
+    text-align: left;
+    font-size: 0.95rem;
+    color: var(--text-body);
+    line-height: 1.7;
+  }
+  .intro-card strong {
+    color: var(--accent-gold);
+  }
+  .intro-card ul {
+    margin-left: 20px;
+    margin-top: 10px;
+    color: var(--text-muted);
+  }
+  .intro-card li {
+    margin-bottom: 6px;
+  }
+
+  .start-btn {
+    display: inline-block;
+    padding: 16px 44px;
+    font-size: 1.15rem;
+    font-weight: 800;
+    color: #ffffff;
+    background: linear-gradient(135deg, #e62347, #ff5778);
+    border: none;
+    border-radius: 40px;
+    cursor: pointer;
+    box-shadow: 0 8px 25px rgba(230, 35, 71, 0.45);
+    transition: all 0.2s;
+  }
+  .start-btn:hover {
+    transform: translateY(-2px) scale(1.02);
+    box-shadow: 0 10px 32px rgba(255, 51, 85, 0.65);
+  }
+  .start-btn:active {
+    transform: translateY(1px);
+  }
+
+  /* 判定中ローディング画面 */
+  .evaluating-view {
+    text-align: center;
+    padding: 40px 10px;
+    animation: fadeIn 0.3s ease;
+  }
+  .eval-spinner {
+    width: 60px;
+    height: 60px;
+    border: 4px solid rgba(255, 184, 46, 0.15);
+    border-top: 4px solid var(--accent-gold);
+    border-radius: 50%;
+    margin: 0 auto 20px;
+    animation: spin 0.8s linear infinite;
+  }
+  @keyframes spin {
+    100% { transform: rotate(360deg); }
+  }
+  .eval-text {
+    font-size: 1.25rem;
+    font-weight: 900;
+    color: #fff;
+    letter-spacing: 0.1em;
+    margin-bottom: 8px;
+  }
+  .eval-sub {
+    font-size: 0.85rem;
+    color: var(--text-muted);
+  }
+
+  /* 結果画面 */
+  .result-view {
+    animation: resultDrop 0.5s cubic-bezier(0.18, 0.89, 0.32, 1.28);
+    text-align: center;
+  }
+  @keyframes resultDrop {
+    from { opacity: 0; transform: scale(0.92) translateY(20px); }
+    to { opacity: 1; transform: scale(1) translateY(0); }
+  }
+
+  /* 技能検定結果通知書（免許証・賞状カード） */
+  .license-box {
+    background: linear-gradient(145deg, #202738 0%, #151924 100%);
+    border: 2px solid var(--accent-gold);
+    border-radius: 14px;
+    padding: 24px 20px 28px;
+    margin-bottom: 22px;
+    text-align: left;
+    position: relative;
+    box-shadow: 0 10px 40px rgba(0, 0, 0, 0.7), 0 0 25px var(--accent-gold-glow);
+    overflow: hidden;
+  }
+
+  /* キラリと光るシマーエフェクト */
+  .license-box::after {
+    content: "";
+    position: absolute;
+    top: -50%; left: -50%;
+    width: 200%; height: 200%;
+    background: linear-gradient(
+      60deg,
+      transparent 40%,
+      rgba(255, 255, 255, 0.08) 50%,
+      transparent 60%
+    );
+    animation: shimmer 4s infinite linear;
+    pointer-events: none;
+  }
+  @keyframes shimmer {
+    0% { transform: translateX(-100%); }
+    100% { transform: translateX(100%); }
+  }
+
+  .license-top {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    border-bottom: 1px solid rgba(255, 184, 46, 0.3);
+    padding-bottom: 10px;
+    margin-bottom: 16px;
+  }
+  .license-org {
+    font-size: 0.82rem;
+    font-weight: 900;
+    color: var(--accent-gold);
+    letter-spacing: 0.12em;
+    display: flex;
+    align-items: center;
+    gap: 6px;
+  }
+  .license-code {
+    font-size: 0.78rem;
+    color: #94a3b8;
+    font-family: monospace;
+    letter-spacing: 1px;
+  }
+
+  .rank-center {
+    text-align: center;
+    margin: 16px 0 20px;
+    position: relative;
+  }
+  .rank-badge {
+    font-size: 0.85rem;
+    font-weight: 800;
+    color: var(--accent-gold);
+    letter-spacing: 0.2em;
+    margin-bottom: 4px;
+    text-transform: uppercase;
+  }
+  .rank-grade {
+    font-size: 2.8rem;
+    font-weight: 900;
+    letter-spacing: 0.05em;
+    line-height: 1.1;
+    margin-bottom: 6px;
+    text-shadow: 0 0 25px currentColor;
+  }
+  .rank-title {
+    font-size: 1.25rem;
+    font-weight: 900;
+    color: var(--text-main);
+    letter-spacing: 0.04em;
+  }
+
+  .desc-box {
+    background: rgba(13, 16, 23, 0.75);
+    border: 1px solid var(--border-color);
+    border-radius: 10px;
+    padding: 16px;
+    margin-top: 14px;
+    font-size: 0.95rem;
+    color: #cbd5e1;
+    line-height: 1.7;
+    white-space: pre-wrap;
+    position: relative;
+    z-index: 2;
+  }
+
+  /* 協会公認の角印スタンプ（CSS & SVG） */
+  .seal-stamp {
+    position: absolute;
+    right: 18px;
+    bottom: 18px;
+    width: 76px;
+    height: 76px;
+    border: 3px solid #ff4444;
+    border-radius: 8px;
+    color: #ff4444;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    font-size: 0.75rem;
+    font-weight: 900;
+    letter-spacing: 1px;
+    line-height: 1.2;
+    transform: rotate(-12deg);
+    opacity: 0.88;
+    pointer-events: none;
+    box-shadow: 0 0 10px rgba(255, 68, 68, 0.3);
+    background: rgba(255, 68, 68, 0.04);
+    z-index: 3;
+  }
+
+  /* アクションボタングループ */
+  .action-row {
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+    margin-top: 24px;
+  }
+
+  .btn-share {
+    background: #000000;
+    border: 1.5px solid #4a5568;
+    color: #ffffff;
+    padding: 15px 24px;
+    border-radius: 30px;
+    font-weight: 900;
+    font-size: 1rem;
+    text-decoration: none;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 10px;
+    transition: all 0.2s;
+    box-shadow: 0 4px 16px rgba(0,0,0,0.4);
+  }
+  .btn-share:hover {
+    background: #111827;
+    border-color: #cbd5e1;
+    transform: translateY(-2px);
+    box-shadow: 0 6px 20px rgba(255, 255, 255, 0.15);
+  }
+
+  .sub-actions {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 10px;
+  }
+
+  .btn-sub {
+    background: rgba(30, 36, 50, 0.8);
+    border: 1.5px solid var(--border-color);
+    color: #e2e8f0;
+    padding: 12px 16px;
+    border-radius: 25px;
+    font-weight: 700;
+    font-size: 0.9rem;
+    cursor: pointer;
+    transition: all 0.2s;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 6px;
+  }
+  .btn-sub:hover {
+    background: rgba(45, 55, 75, 0.9);
+    border-color: var(--accent-gold);
+    color: #fff;
+    transform: translateY(-1px);
+  }
+
+  .btn-replay {
+    background: transparent;
+    border: 1.5px solid var(--accent-red);
+    color: #ff758f;
+    padding: 14px 24px;
+    border-radius: 30px;
+    font-weight: 800;
+    font-size: 0.95rem;
+    cursor: pointer;
+    transition: all 0.2s;
+    margin-top: 4px;
+  }
+  .btn-replay:hover {
+    background: rgba(255, 51, 85, 0.15);
+    color: #ffffff;
+    transform: translateY(-2px);
+  }
+
+  /* コピートースト通知 */
+  .toast-notice {
+    position: fixed;
+    bottom: 24px;
+    left: 50%;
+    transform: translateX(-50%) translateY(50px);
+    background: rgba(15, 20, 30, 0.95);
+    border: 1px solid var(--accent-gold);
+    color: #fff;
+    padding: 10px 22px;
+    border-radius: 25px;
+    font-size: 0.9rem;
+    font-weight: 700;
+    box-shadow: 0 6px 20px rgba(0, 0, 0, 0.6);
+    opacity: 0;
+    pointer-events: none;
+    transition: all 0.25s cubic-bezier(0.18, 0.89, 0.32, 1.28);
+    z-index: 1000;
+    display: flex;
+    align-items: center;
+    gap: 6px;
+  }
+  .toast-notice.show {
+    opacity: 1;
+    transform: translateX(-50%) translateY(0);
+  }
+
+  /* 紙吹雪Canvas */
+  #confettiCanvas {
+    position: fixed;
+    top: 0; left: 0;
+    width: 100vw; height: 100vh;
+    pointer-events: none;
+    z-index: 999;
+  }
+
+  footer {
+    text-align: center;
+    margin-top: 24px;
+    font-size: 0.78rem;
+    color: var(--text-muted);
+  }
+</style>
+</head>
+<body>
+
+<canvas id="confettiCanvas"></canvas>
+<div id="toastNotice" class="toast-notice">📋 結果テキストをコピーしました！</div>
+
+<div style="width:100%; max-width:660px;">
+  <!-- サウンドON/OFF切り替え -->
+  <div class="top-controls">
+    <button id="soundToggleBtn" class="sound-btn on" onclick="toggleSound()">
+      🔊 サウンド: ON
+    </button>
+  </div>
+
+  <div class="main-wrapper">
+    <div class="hazard-bar"></div>
+    <div class="inner-content">
+
+      <!-- スタート画面 -->
+      <div id="startScreen" class="start-view">
+        <div>
+          <span class="badge-org">全日本フラグ建築業協会 技能検定</span>
+        </div>
+        <h1>⚠️ 死亡フラグ建築検定 ⚠️</h1>
+        <p class="subtitle">― どんな窮地でも、芸術的な死亡フラグを建てられるか？ ―</p>
+
+        <div class="intro-card">
+          <p>死亡フラグは、決して偶然生まれるものではありません。<br>熟練の職人が魂のセリフで<strong>「意図して建てる」</strong>高貴な建造物です。</p>
+          <p style="margin-top:12px;">次々と訪れる絶体絶命のシチュエーション。<br><strong>「この状況で、あなたが放つセリフは！？」</strong></p>
+          <ul>
+            <li>厳選された全8問。直感でセリフを選んでください。</li>
+            <li>点数は出ず、最終結果であなたの<strong>【建築士ランク】</strong>のみが判定されます。</li>
+            <li>保身や安全に走ると、手抜き工事と判定されます。</li>
+          </ul>
+        </div>
+
+        <button class="start-btn" onclick="startQuiz()">
+          🔨 現場に入場する（検定開始）
+        </button>
+      </div>
+
+      <!-- クイズ画面 -->
+      <div id="quizScreen" style="display:none;">
+        <div class="progress-section">
+          <div class="progress-label">
+            <span id="progressText">第 1 問 / 全 8 問</span>
+            <span>フラグ建築中</span>
+          </div>
+          <div class="progress-track">
+            <div class="progress-fill" id="progressFill"></div>
+          </div>
+        </div>
+
+        <div id="questionContainer"></div>
+      </div>
+
+      <!-- 判定中ローディング画面 -->
+      <div id="evaluatingScreen" style="display:none;" class="evaluating-view">
+        <div class="eval-spinner"></div>
+        <div class="eval-text">フラグ強度鑑定中…</div>
+        <div class="eval-sub">全日本フラグ建築業協会 中央審査部</div>
+      </div>
+
+      <!-- 結果画面 -->
+      <div id="resultScreen" style="display:none;"></div>
+
+      <footer>
+        © 全日本死亡フラグ建築検定委員会 / GitHub Pages 対応版
+      </footer>
+
+    </div>
+  </div>
+</div>
+
+<script>
+/* ========================================================
+   1. サウンドシステム (Web Audio API - 外部ファイル不要)
+   ======================================================== */
+let audioCtx = null;
+let soundEnabled = true;
+
+function initAudio() {
+  if (!audioCtx) {
+    const AudioContextClass = window.AudioContext || window.webkitAudioContext;
+    if (AudioContextClass) {
+      audioCtx = new AudioContextClass();
+    }
+  }
+  if (audioCtx && audioCtx.state === 'suspended') {
+    audioCtx.resume();
+  }
+}
+
+function toggleSound() {
+  soundEnabled = !soundEnabled;
+  const btn = document.getElementById('soundToggleBtn');
+  if (soundEnabled) {
+    btn.classList.add('on');
+    btn.innerHTML = '🔊 サウンド: ON';
+    playClickSound();
+  } else {
+    btn.classList.remove('on');
+    btn.innerHTML = '🔇 サウンド: OFF';
+  }
+}
+
+// 金槌で杭を打つような建築打撃音（クリック時）
+function playClickSound() {
+  if (!soundEnabled || !audioCtx) return;
+  try {
+    const t = audioCtx.currentTime;
+    const osc = audioCtx.createOscillator();
+    const gain = audioCtx.createGain();
+
+    osc.type = 'triangle';
+    osc.frequency.setValueAtTime(680, t);
+    osc.frequency.exponentialRampToValueAtTime(140, t + 0.12);
+
+    gain.gain.setValueAtTime(0.3, t);
+    gain.gain.exponentialRampToValueAtTime(0.001, t + 0.12);
+
+    osc.connect(gain);
+    gain.connect(audioCtx.destination);
+
+    osc.start(t);
+    osc.stop(t + 0.12);
+  } catch(e) {}
+}
+
+// 開始時サイレン風トーン
+function playStartSound() {
+  if (!soundEnabled || !audioCtx) return;
+  try {
+    const t = audioCtx.currentTime;
+    const osc = audioCtx.createOscillator();
+    const gain = audioCtx.createGain();
+
+    osc.type = 'sine';
+    osc.frequency.setValueAtTime(320, t);
+    osc.frequency.linearRampToValueAtTime(640, t + 0.15);
+    osc.frequency.linearRampToValueAtTime(440, t + 0.3);
+
+    gain.gain.setValueAtTime(0.2, t);
+    gain.gain.linearRampToValueAtTime(0.25, t + 0.15);
+    gain.gain.exponentialRampToValueAtTime(0.001, t + 0.35);
+
+    osc.connect(gain);
+    gain.connect(audioCtx.destination);
+
+    osc.start(t);
+    osc.stop(t + 0.35);
+  } catch(e) {}
+}
+
+// 結果発表時のファンファーレ（RANK A, B）
+function playFanfareSound() {
+  if (!soundEnabled || !audioCtx) return;
+  try {
+    const notes = [440, 554.37, 659.25, 880]; // A - C# - E - A
+    notes.forEach((freq, idx) => {
+      const t = audioCtx.currentTime + (idx * 0.1);
+      const osc = audioCtx.createOscillator();
+      const gain = audioCtx.createGain();
+
+      osc.type = 'triangle';
+      osc.frequency.setValueAtTime(freq, t);
+
+      gain.gain.setValueAtTime(0.18, t);
+      gain.gain.exponentialRampToValueAtTime(0.001, t + 0.45);
+
+      osc.connect(gain);
+      gain.connect(audioCtx.destination);
+
+      osc.start(t);
+      osc.stop(t + 0.45);
+    });
+  } catch(e) {}
+}
+
+// 結果発表時の脱力音（何しに来た？、RANK F）
+function playDullSound() {
+  if (!soundEnabled || !audioCtx) return;
+  try {
+    const t = audioCtx.currentTime;
+    const osc = audioCtx.createOscillator();
+    const gain = audioCtx.createGain();
+
+    osc.type = 'sawtooth';
+    osc.frequency.setValueAtTime(320, t);
+    osc.frequency.exponentialRampToValueAtTime(90, t + 0.5);
+
+    gain.gain.setValueAtTime(0.2, t);
+    gain.gain.exponentialRampToValueAtTime(0.001, t + 0.5);
+
+    osc.connect(gain);
+    gain.connect(audioCtx.destination);
+
+    osc.start(t);
+    osc.stop(t + 0.5);
+  } catch(e) {}
+}
+
+/* ========================================================
+   2. 設問データ（厳選全8問・各設問4択）
+   ======================================================== */
+const questions = [
+  {
+    category: "第1問：未来・約束系",
+    title: "決戦前夜の焚き火",
+    situation: "明日は敵主力軍との総力決戦。静まり返る野営地の焚き火の前で、長年苦楽を共にしてきた戦友が「……明日は生きて帰れるかな」と呟いた。",
+    prompt: "戦友の肩に手を置き、あなたが静かに放つセリフは！？",
+    choices: [
+      { text: "「安心しろ。今度、子供が産まれるんだ…だから絶対に死ねない」", score: 3 },
+      { text: "「すべてが終わったら…お前に謝りたいことがあるんだ」", score: 3 },
+      { text: "「故郷に帰ったら、親父の仕事を継ぐって決めてるんだ」", score: 1 },
+      { text: "「余計な私情は挟むな。退路と作戦手順をもう一度復習して、明日の生存率を0.1%でも上げろ」", score: 0 }
+    ]
+  },
+  {
+    category: "第2問：犠牲・殿（しんがり）系",
+    title: "迫る敵大群と閉鎖ドア",
+    situation: "脱出通路の防護隔壁が破損！誰かが外のレバーを手動で押し続けないと仲間が逃げられない。背後からは無数の敵の雄叫びが迫る。",
+    prompt: "振り返った仲間たちに向け、あなたが叫ぶセリフは！？",
+    choices: [
+      { text: "「ここは俺に任せて先に行け！！早くしろォ！！」", score: 3 },
+      { text: "「心配すんな、後からすぐ追いつく…向こうで待っててくれ！」", score: 3 },
+      { text: "「俺が食い止める！お前たちを絶対に死なせない！」", score: 1 },
+      { text: "「誰か一人が犠牲になるのは論外だ！外側の非常ロックピンを差し込めばレバーを離せる、全員で走るぞ！」", score: 0 }
+    ]
+  },
+  {
+    category: "第3問：油断・慢心系",
+    title: "必殺技直後の爆煙",
+    situation: "味方全員の魔力を注ぎ込んだ渾身の総攻撃が敵のボスに直撃！爆心地には濛々と激しい煙が立ち込めている……！",
+    prompt: "息を切らしながら、あなたが爆煙を見つめて放つセリフは！？",
+    choices: [
+      { text: "「やったか……！？」", score: 3 },
+      { text: "「ふっ、他愛もない…こんなものか。これで終わりだ」", score: 3 },
+      { text: "「…手応えはあった。だが煙が晴れるまで武器を下ろすな」", score: 1 },
+      { text: "「武器を下ろすな！即座に遮蔽物に隠れろ！敵が無傷である前提で索敵と迎撃態勢を維持！」", score: 0 }
+    ]
+  },
+  {
+    category: "第4問：単独行動・パニック系",
+    title: "孤島・洋館の密室殺人",
+    situation: "嵐で橋が落ち、外界と完全に遮断された洋館で第一の凄惨な遺体が発見された！パニックに陥る宿泊客たち。",
+    prompt: "ヒステリックに叫び出す一同を前に、あなたが言い放つセリフは！？",
+    choices: [
+      { text: "「誰が犯人かもわからないのに、同じ部屋にいられるか！俺は自室に戻るぞ！」", score: 3 },
+      { text: "「ちょっと外の様子を見てくる。裏口の鍵を確認するだけだ」", score: 3 },
+      { text: "「犯人はこの中にいる…！俺が暴いてみせる！」", score: 1 },
+      { text: "「全員リビングの中央に集まれ！警察が来るまで絶対に一人になるな、手分けも単独行動も一切禁止だ！」", score: 0 }
+    ]
+  },
+  {
+    category: "第5問：ホラー・探索系",
+    title: "暗闇の不気味な物音",
+    situation: "深夜の廃病院を探索中。懐中電灯の光の先、奥の薬品庫から「ガサガサッ…」と不気味な物音が響いた。",
+    prompt: "物音がした暗闇に向けて、あなたが口にするセリフは！？",
+    choices: [
+      { text: "「……気のせいか。なんだ、猫か」", score: 3 },
+      { text: "「おい、誰か隠れてるのか？…冗談はやめろよ（奥を覗き込む）」", score: 3 },
+      { text: "「気味が悪いな…おい、念のため銃を抜け」", score: 1 },
+      { text: "「確認の必要はない。未知の危険が存在する可能性がある以上、直ちに背を向けずに病院から撤退するぞ」", score: 0 }
+    ]
+  },
+  {
+    category: "第6問：パンデミック系",
+    title: "感染地帯からの脱出",
+    situation: "ゾンビが徘徊する危険地帯を走り抜け、ようやく脱出ヘリが待つ非常口の前に辿り着いた生存者グループ。",
+    prompt: "荒い息を整えながら、あなたが周囲を見渡して放つセリフは！？",
+    choices: [
+      { text: "「ふぅ…この中に噛まれたやつは……よし、いないな！」", score: 3 },
+      { text: "「やっと出口を見つけたぞ！急いで外へ出るんだ！」", score: 3 },
+      { text: "「信じてくれ、俺ならできる！俺に任せてくれ！」", score: 1 },
+      { text: "「待て！扉を開けるな！覗き窓からヘリポートの安全を目視確認し、全員の衣服を脱いで噛み跡の相互点検が先だ！」", score: 0 }
+    ]
+  },
+  {
+    category: "第7問：勝利宣言系",
+    title: "追い詰めた強敵",
+    situation: "激戦の末、宿敵を追い詰め刃を突きつけたあなた。相手が「頼む…見逃してくれ」と命乞いをしてきた。",
+    prompt: "刃を向けたまま、あなたが吐き捨てるセリフは！？",
+    choices: [
+      { text: "「ふん、虫けらが…冥土の土産に、俺たちの計画を教えてやる」", score: 3 },
+      { text: "「ここが貴様の墓場だ！……ふっ、他愛のない奴だったな」", score: 3 },
+      { text: "「命乞いなど見苦しい。今すぐ楽にしてやる」", score: 1 },
+      { text: "（相手に一切の言葉を発する隙を与えず、命乞いを聞く前に即座に急所を貫く）", score: 0 }
+    ]
+  },
+  {
+    category: "第8問：最後の別れ系",
+    title: "崩壊する要塞の脱出ポッド",
+    situation: "崩壊する要塞。負傷したあなたを抱えて脱出しようとする仲間。だが二人の重量では脱出ポッドが上がらない。",
+    prompt: "静かに仲間の手をほどき、あなたが笑って告げるセリフは！？",
+    choices: [
+      { text: "「バカ野郎…お前だけでも生き残るんだ。俺の分まで、太陽を見てくれ」", score: 3 },
+      { text: "「生きて帰れたら…ゆっくり休むって決めてたのにな。…先に行け」", score: 3 },
+      { text: "「心配するな、必ず後から追いつく…向こうで待っててくれ」", score: 1 },
+      { text: "「諦めるな！脱出ポッドの予備燃料タンク（80kg）を海に切り離せば二人とも上昇可能だ、今すぐ外せ！」", score: 0 }
+    ]
+  }
+];
+
+/* ========================================================
+   3. 判定テーブル（全7段階）
+   ======================================================== */
+const rankTable = [
+  {
+    min: 22, max: 24,
+    rank: "RANK A",
+    title: "神域の一級死亡フラグ建築士",
+    color: "#ff3355",
+    desc: "お見事！あらゆる絶望的状況において、寸分の狂いもなく最高強度の死亡フラグを建立できる伝説の宮大工です。\n\n「子供が産まれる」「ここは任せて先に行け」「やったか！」「なんだ猫か」「噛まれたやつはいないな」など、歴史的建材を完璧に組み上げるその腕前は芸術の域。あなたが口を開いた瞬間、映画のBGMは止まり、観客はハンカチを用意します。開始45分以内の美しい退場が100%保証されています。"
+  },
+  {
+    min: 18, max: 21,
+    rank: "RANK B",
+    title: "熟練の死亡フラグ棟梁",
+    color: "#ff7b36",
+    desc: "素晴らしい建築センスです！定番フラグを完璧に熟知し、観客の期待に応える立派なフラグを建立できます。\n\nクライマックス直前、主人公たちを逃がすために笑顔で残る頼れるベテラン。「俺が守る」「必ず後から追いつく」と告げて散るその散り際の美学は、作中屈指の名シーンとしてファンの間で長く語り継がれるでしょう。"
+  },
+  {
+    min: 14, max: 17,
+    rank: "RANK C",
+    title: "一人前のフラグ大工",
+    color: "#ffbe2e",
+    desc: "適度にフラグを建てられる一人前の職人です。\n\n油断や慢心から「ふっ、他愛もない」と呟いて背後からやられたり、怪しい部屋に単身突入して叫び声をあげるポジション。映画をテンポよく盛り上げる貴重なバイプレイヤーです。"
+  },
+  {
+    min: 10, max: 13,
+    rank: "RANK D",
+    title: "見習いフラグ職人",
+    color: "#a3e635",
+    desc: "フラグを建てようとはしていますが、心の奥底で「死にたくない」という生への未練がセリフに出てしまっています。\n\nそのためフラグ強度が足りず、大怪我を負うものの最終回の病室で包帯ぐるぐる巻きで生き残ってしまうタイプです。一人前の建築士になるには、もっと堂々と子供や恋人の話を語りましょう。"
+  },
+  {
+    min: 6, max: 9,
+    rank: "RANK E",
+    title: "素人日曜大工",
+    color: "#38bdf8",
+    desc: "フラグ建築の基礎がグラグラです。\n\nセリフの途中で変に冷静さを取り戻したり、相手の安否を慎重に確認してしまったりして、フラグが建つ前に自分でへし折ってしまいます。ホラー映画では序盤の逃走劇で生き残る地味なポジションです。"
+  },
+  {
+    min: 3, max: 5,
+    rank: "RANK F",
+    title: "無自覚なフラグ解体業者",
+    color: "#818cf8",
+    desc: "建築するどころか、周りがせっかく建てたフラグまで片っ端からへし折っていくクラッシャーです。\n\n感動の別れシーンで荷物を捨てさせたり、煙の中にさらに手榴弾を投げ込んだりする空気の読めなさ。ドラマを成立させない現実主義者です。"
+  },
+  {
+    min: 0, max: 2,
+    rank: "何しに来た？",
+    title: "冷酷無比な完全生存リアリスト",
+    color: "#94a3b8",
+    desc: "【検定失格！】フラグ建築士としての適性はゼロ。完全な手抜き工事です！\n\n「危ないから帰る」「突っ張り棒で固定」「即座に首を刎ねる」。ドラマや様式美よりも己の命を最優先し、ホラー映画なら開始5分でタクシーで帰宅して映画を終わらせてしまいます。生存率は99.9%ですが、映画ファンからポップコーンを投げつけられます。"
+  }
+];
+
+// Fisher-Yates シャッフル
+function shuffleArray(array) {
+  const arr = [...array];
+  for (let i = arr.length - 1; i > 0; i--) {
+    const j = Math.floor(Math.random() * (i + 1));
+    [arr[i], arr[j]] = [arr[j], arr[i]];
+  }
+  return arr;
+}
+
+let currentIndex = 0;
+let internalScore = 0;
+let isLocked = false;
+let currentResultObj = null;
+
+function startQuiz() {
+  initAudio();
+  playStartSound();
+  stopConfetti();
+
+  currentIndex = 0;
+  internalScore = 0;
+  isLocked = false;
+
+  document.getElementById('startScreen').style.display = 'none';
+  document.getElementById('resultScreen').style.display = 'none';
+  document.getElementById('evaluatingScreen').style.display = 'none';
+  document.getElementById('quizScreen').style.display = 'block';
+
+  renderQuestion();
+}
+
+function renderQuestion() {
+  const q = questions[currentIndex];
+  const progressRatio = (currentIndex / questions.length) * 100;
+  
+  document.getElementById('progressFill').style.width = progressRatio + '%';
+  document.getElementById('progressText').innerText = `第 ${currentIndex + 1} 問 / 全 ${questions.length} 問`;
+
+  // 選択肢オブジェクト（textとscoreのペア）を丸ごと安全にシャッフル
+  const shuffledChoices = shuffleArray(q.choices);
+
+  const choicesHtml = shuffledChoices.map((c, i) => `
+    <button class="choice-btn" id="choiceBtn_${i}" onclick="chooseOption(${i}, ${c.score})">
+      ${c.text}
+    </button>
+  `).join('');
+
+  document.getElementById('questionContainer').innerHTML = `
+    <div class="question-wrapper">
+      <div class="situation-box">
+        <div class="situation-tag">${q.category}</div>
+        <div class="situation-title">📍 ${q.title}</div>
+        <div class="situation-text">${q.situation}</div>
+        <div class="prompt-call">
+          💬 ${q.prompt}
+        </div>
+      </div>
+      <div class="choices-container">
+        ${choicesHtml}
+      </div>
+    </div>
+  `;
+}
+
+function chooseOption(btnIdx, score) {
+  if (isLocked) return;
+  isLocked = true;
+
+  initAudio();
+  playClickSound();
+
+  internalScore += score;
+
+  const selectedBtn = document.getElementById(`choiceBtn_${btnIdx}`);
+  if (selectedBtn) {
+    selectedBtn.classList.add('selected');
+  }
+
+  const allBtns = document.querySelectorAll('.choice-btn');
+  allBtns.forEach(btn => btn.disabled = true);
+
+  setTimeout(() => {
+    currentIndex++;
+    isLocked = false;
+    if (currentIndex >= questions.length) {
+      startEvaluation();
+    } else {
+      renderQuestion();
+    }
+  }, 220);
+}
+
+// 判定中のドラムロール演出
+function startEvaluation() {
+  document.getElementById('progressFill').style.width = '100%';
+  document.getElementById('quizScreen').style.display = 'none';
+  document.getElementById('evaluatingScreen').style.display = 'block';
+
+  setTimeout(() => {
+    document.getElementById('evaluatingScreen').style.display = 'none';
+    showResult();
+  }, 900);
+}
+
+function showResult() {
+  const result = rankTable.find(r => internalScore >= r.min && internalScore <= r.max) || rankTable[rankTable.length - 1];
+  currentResultObj = result;
+
+  // サウンド再生＆紙吹雪
+  if (result.rank === 'RANK A' || result.rank === 'RANK B') {
+    playFanfareSound();
+    startConfetti();
+  } else if (result.rank === '何しに来た？' || result.rank === 'RANK F') {
+    playDullSound();
+  }
+
+  // 本番環境（http/https）なら実際のURL、ローカルファイルなら空（無効なfile://URLを防止）
+  const isWeb = window.location.protocol.startsWith('http');
+  const pageUrl = isWeb ? window.location.href : '';
+
+  // X（Twitter）投稿用テキスト：140文字制限を厳守
+  const tweetText = `【死亡フラグ建築検定】\n技能判定：${result.rank}\n『${result.title}』\n\nあなたのフラグ建築スキルを測定！\n#死亡フラグ建築検定`;
+  const twitterUrl = pageUrl 
+    ? `https://twitter.com/intent/tweet?text=${encodeURIComponent(tweetText)}&url=${encodeURIComponent(pageUrl)}`
+    : `https://twitter.com/intent/tweet?text=${encodeURIComponent(tweetText)}`;
+
+  const examSerial = Math.floor(1000 + Math.random() * 9000);
+
+  const resultContainer = document.getElementById('resultScreen');
+  resultContainer.style.display = 'block';
+  resultContainer.innerHTML = `
+    <div class="result-view">
+      
+      <div class="license-box">
+        <div class="license-top">
+          <div class="license-org">
+            <span>🏛️</span>
+            <span>全日本フラグ建築業協会 技能検定結果通知書</span>
+          </div>
+          <div class="license-code">FLG-${examSerial}</div>
+        </div>
+
+        <div class="rank-center">
+          <div class="rank-badge">技能判定ランク</div>
+          <div class="rank-grade" style="color: ${result.color};">${result.rank}</div>
+          <div class="rank-title">${result.title}</div>
+        </div>
+
+        <div class="desc-box">${result.desc}</div>
+
+        <!-- 協会公認角印スタンプ -->
+        <div class="seal-stamp">
+          <div>建築</div>
+          <div>合格</div>
+          <div style="font-size:0.6rem;opacity:0.8;">協会之印</div>
+        </div>
+      </div>
+
+      <div class="action-row">
+        <a href="${twitterUrl}" target="_blank" rel="noopener" class="btn-share">
+          𝕏 で判定ランクを自慢する
+        </a>
+
+        <div class="sub-actions">
+          <button class="btn-sub" onclick="copyResultText()">
+            📋 結果をコピー
+          </button>
+          <button class="btn-sub" onclick="shareNative()">
+            📱 端末から共有
+          </button>
+        </div>
+
+        <button class="btn-replay" onclick="startQuiz()">
+          🔄 別のセリフで再受検する
+        </button>
+      </div>
+
+    </div>
+  `;
+}
+
+// 結果テキストのクリップボードコピー
+function copyResultText() {
+  if (!currentResultObj) return;
+  const isWeb = window.location.protocol.startsWith('http');
+  const urlSuffix = isWeb ? `\n${window.location.href}` : '';
+  const text = `【死亡フラグ建築検定】\n判定：${currentResultObj.rank}\n『${currentResultObj.title}』\n\nあなたのフラグ建築スキルを測定！\n#死亡フラグ建築検定${urlSuffix}`;
+
+  if (navigator.clipboard && navigator.clipboard.writeText) {
+    navigator.clipboard.writeText(text).then(() => showToast('📋 結果テキストをコピーしました！'));
+  } else {
+    const ta = document.createElement('textarea');
+    ta.value = text;
+    document.body.appendChild(ta);
+    ta.select();
+    document.execCommand('copy');
+    document.body.removeChild(ta);
+    showToast('📋 結果テキストをコピーしました！');
+  }
+}
+
+// Web Share API（スマホから直でLINE/X等へ共有）
+function shareNative() {
+  if (!currentResultObj) return;
+  const isWeb = window.location.protocol.startsWith('http');
+  const text = `【死亡フラグ建築検定】判定：${currentResultObj.rank}『${currentResultObj.title}』`;
+  const shareData = {
+    title: '死亡フラグ建築検定',
+    text: text
+  };
+  if (isWeb) {
+    shareData.url = window.location.href;
+  }
+
+  if (navigator.share) {
+    navigator.share(shareData).catch(() => {});
+  } else {
+    copyResultText();
+  }
+}
+
+function showToast(msg) {
+  const toast = document.getElementById('toastNotice');
+  toast.innerText = msg;
+  toast.classList.add('show');
+  setTimeout(() => toast.classList.remove('show'), 2200);
+}
+
+/* ========================================================
+   4. 紙吹雪パーティクル (Canvas)
+   ======================================================== */
+let confettiReq = null;
+const canvas = document.getElementById('confettiCanvas');
+const ctx = canvas.getContext('2d');
+let particles = [];
+
+function resizeCanvas() {
+  canvas.width = window.innerWidth;
+  canvas.height = window.innerHeight;
+}
+window.addEventListener('resize', resizeCanvas);
+resizeCanvas();
+
+function startConfetti() {
+  stopConfetti();
+  resizeCanvas();
+  particles = [];
+  const colors = ['#ff3355', '#ffb82e', '#ff9436', '#ffffff', '#ffd700'];
+  for (let i = 0; i < 90; i++) {
+    particles.push({
+      x: Math.random() * canvas.width,
+      y: Math.random() * -canvas.height * 0.5,
+      w: Math.random() * 8 + 5,
+      h: Math.random() * 8 + 5,
+      color: colors[Math.floor(Math.random() * colors.length)],
+      vy: Math.random() * 2.5 + 2,
+      vx: (Math.random() - 0.5) * 1.5,
+      rot: Math.random() * 360,
+      vrot: (Math.random() - 0.5) * 6
+    });
+  }
+
+  function loop() {
+    ctx.clearRect(0, 0, canvas.width, canvas.height);
+    particles.forEach(p => {
+      p.y += p.vy;
+      p.x += p.vx;
+      p.rot += p.vrot;
+
+      ctx.save();
+      ctx.translate(p.x, p.y);
+      ctx.rotate((p.rot * Math.PI) / 180);
+      ctx.fillStyle = p.color;
+      ctx.fillRect(-p.w / 2, -p.h / 2, p.w, p.h);
+      ctx.restore();
+
+      if (p.y > canvas.height) {
+        p.y = -20;
+        p.x = Math.random() * canvas.width;
+      }
+    });
+    confettiReq = requestAnimationFrame(loop);
+  }
+  loop();
+}
+
+function stopConfetti() {
+  if (confettiReq) cancelAnimationFrame(confettiReq);
+  confettiReq = null;
+  ctx.clearRect(0, 0, canvas.width, canvas.height);
+}
+</script>
+
+</body>
+</html>
