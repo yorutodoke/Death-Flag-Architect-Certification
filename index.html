@@ -11,9 +11,14 @@
 <meta property="og:title" content="⚠️ 死亡フラグ建築検定 ⚠️">
 <meta property="og:description" content="絶体絶命のシチュエーションであなたが放つセリフは！？あなたの死亡フラグ建築士ランクを診断！">
 <meta property="og:type" content="website">
+<meta property="og:image" content="./ogp.png">
 <meta name="twitter:card" content="summary_large_image">
-<meta name="twitter:title" content="死亡フラグ建築検定">
-<meta name="twitter:description" content="どんな窮地でも芸術的な死亡フラグを建てられるか？あなたの建築士ランクを判定！">
+<meta name="twitter:title" content="⚠️ 死亡フラグ建築検定 ⚠️">
+<meta name="twitter:description" content="絶体絶命のシチュエーションであなたが放つセリフは！？あなたの死亡フラグ建築士ランクを診断！">
+<meta name="twitter:image" content="./ogp.png">
+
+<!-- html2canvas (結果カードDOM画像化用ライブラリ) -->
+<script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
 
 <style>
   :root {
@@ -1094,14 +1099,30 @@ function showResult() {
     playDullSound();
   }
 
-  // 本番環境（http/https）なら実際のURL、ローカルファイルなら空（無効なfile://URLを防止）
+  // ランク別スラッグマッピング
+  const rankSlugMap = {
+    'RANK A': 'a',
+    'RANK B': 'b',
+    'RANK C': 'c',
+    'RANK D': 'd',
+    'RANK E': 'e',
+    'RANK F': 'f',
+    '何しに来た？': 'none'
+  };
+  const slug = rankSlugMap[result.rank] || 'a';
+
+  // 本番環境（http/https）なら該当ランク専用の中継ページURL、ローカルなら空
   const isWeb = window.location.protocol.startsWith('http');
-  const pageUrl = isWeb ? window.location.href : '';
+  let shareUrl = '';
+  if (isWeb) {
+    const baseUrl = window.location.href.split('?')[0].split('#')[0].replace(/\/index\.html$/, '').replace(/\/$/, '');
+    shareUrl = `${baseUrl}/share/${slug}/`;
+  }
 
   // X（Twitter）投稿用テキスト：140文字制限を厳守
   const tweetText = `【死亡フラグ建築検定】\n技能判定：${result.rank}\n『${result.title}』\n\nあなたのフラグ建築スキルを測定！\n#死亡フラグ建築検定`;
-  const twitterUrl = pageUrl 
-    ? `https://twitter.com/intent/tweet?text=${encodeURIComponent(tweetText)}&url=${encodeURIComponent(pageUrl)}`
+  const twitterUrl = shareUrl 
+    ? `https://twitter.com/intent/tweet?text=${encodeURIComponent(tweetText)}&url=${encodeURIComponent(shareUrl)}`
     : `https://twitter.com/intent/tweet?text=${encodeURIComponent(tweetText)}`;
 
   const examSerial = Math.floor(1000 + Math.random() * 9000);
@@ -1111,7 +1132,7 @@ function showResult() {
   resultContainer.innerHTML = `
     <div class="result-view">
       
-      <div class="license-box">
+      <div class="license-box" id="licenseCardBox">
         <div class="license-top">
           <div class="license-org">
             <span>🏛️</span>
@@ -1137,16 +1158,17 @@ function showResult() {
       </div>
 
       <div class="action-row">
-        <a href="${twitterUrl}" target="_blank" rel="noopener" class="btn-share">
-          𝕏 で判定ランクを自慢する
+        <!-- 診断系の王道：一発で直接Xの投稿画面が起動！（タイムライン上で写真カードが自動表示される） -->
+        <a href="${twitterUrl}" target="_blank" rel="noopener" class="btn-share" id="shareXBtn">
+          𝕏 で結果をポストする
         </a>
 
         <div class="sub-actions">
-          <button class="btn-sub" onclick="copyResultText()">
-            📋 結果をコピー
+          <button class="btn-sub" onclick="downloadResultImage()" id="downloadImgBtn">
+            📸 免許証画像を保存
           </button>
-          <button class="btn-sub" onclick="shareNative()">
-            📱 端末から共有
+          <button class="btn-sub" onclick="copyResultText('${shareUrl}')">
+            📋 結果をコピー
           </button>
         </div>
 
@@ -1159,11 +1181,51 @@ function showResult() {
   `;
 }
 
-// 結果テキストのクリップボードコピー
-function copyResultText() {
+// 免許証画像の単独ダウンロード保存
+async function downloadResultImage() {
   if (!currentResultObj) return;
-  const isWeb = window.location.protocol.startsWith('http');
-  const urlSuffix = isWeb ? `\n${window.location.href}` : '';
+  const btn = document.getElementById('downloadImgBtn');
+  const originalText = btn.innerText;
+  btn.innerText = '⏳ 生成中…';
+
+  try {
+    const cardElement = document.getElementById('licenseCardBox');
+    let blob = null;
+
+    if (typeof html2canvas === 'function' && cardElement) {
+      const canvas = await html2canvas(cardElement, {
+        scale: 2,
+        useCORS: true,
+        backgroundColor: '#151924',
+        logging: false
+      });
+      blob = await new Promise(resolve => canvas.toBlob(resolve, 'image/png', 0.95));
+    }
+
+    if (!blob) {
+      blob = await generateResultCardBlob(currentResultObj, Math.floor(1000 + Math.random() * 9000));
+    }
+
+    const url = URL.createObjectURL(blob);
+    const a = document.createElement('a');
+    a.href = url;
+    a.download = `死亡フラグ建築士免状_${currentResultObj.rank}.png`;
+    document.body.appendChild(a);
+    a.click();
+    document.body.removeChild(a);
+    URL.revokeObjectURL(url);
+    showToast('💾 免許証画像を保存しました！');
+  } catch (e) {
+    showToast('⚠️ 画像の保存に失敗しました');
+  } finally {
+    btn.innerText = originalText;
+  }
+}
+
+// 結果テキストのクリップボードコピー
+function copyResultText(shareUrl) {
+  if (!currentResultObj) return;
+  const urlSuffix = shareUrl ? `\n${shareUrl}` : '';
   const text = `【死亡フラグ建築検定】\n判定：${currentResultObj.rank}\n『${currentResultObj.title}』\n\nあなたのフラグ建築スキルを測定！\n#死亡フラグ建築検定${urlSuffix}`;
 
   if (navigator.clipboard && navigator.clipboard.writeText) {
@@ -1179,26 +1241,6 @@ function copyResultText() {
   }
 }
 
-// Web Share API（スマホから直でLINE/X等へ共有）
-function shareNative() {
-  if (!currentResultObj) return;
-  const isWeb = window.location.protocol.startsWith('http');
-  const text = `【死亡フラグ建築検定】判定：${currentResultObj.rank}『${currentResultObj.title}』`;
-  const shareData = {
-    title: '死亡フラグ建築検定',
-    text: text
-  };
-  if (isWeb) {
-    shareData.url = window.location.href;
-  }
-
-  if (navigator.share) {
-    navigator.share(shareData).catch(() => {});
-  } else {
-    copyResultText();
-  }
-}
-
 function showToast(msg) {
   const toast = document.getElementById('toastNotice');
   toast.innerText = msg;
@@ -1207,9 +1249,10 @@ function showToast(msg) {
 }
 
 /* ========================================================
-   4. 紙吹雪パーティクル (Canvas)
+   4. 紙吹雪パーティクル (ワンショット・軽量・残骸ゼロ設計)
    ======================================================== */
 let confettiReq = null;
+let confettiTimer = null;
 const canvas = document.getElementById('confettiCanvas');
 const ctx = canvas.getContext('2d');
 let particles = [];
@@ -1222,26 +1265,38 @@ window.addEventListener('resize', resizeCanvas);
 resizeCanvas();
 
 function startConfetti() {
-  stopConfetti();
+  stopConfetti(); // 既存のループを確実に完全破棄
   resizeCanvas();
   particles = [];
+
   const colors = ['#ff3355', '#ffb82e', '#ff9436', '#ffffff', '#ffd700'];
-  for (let i = 0; i < 90; i++) {
+  // 最初に画面上部に一斉配置（60個の軽量バースト）
+  for (let i = 0; i < 60; i++) {
     particles.push({
       x: Math.random() * canvas.width,
-      y: Math.random() * -canvas.height * 0.5,
+      y: Math.random() * -canvas.height * 0.35,
       w: Math.random() * 8 + 5,
       h: Math.random() * 8 + 5,
       color: colors[Math.floor(Math.random() * colors.length)],
-      vy: Math.random() * 2.5 + 2,
-      vx: (Math.random() - 0.5) * 1.5,
+      vy: Math.random() * 3 + 2.5,
+      vx: (Math.random() - 0.5) * 2,
       rot: Math.random() * 360,
-      vrot: (Math.random() - 0.5) * 6
+      vrot: (Math.random() - 0.5) * 8
     });
   }
 
   function loop() {
     ctx.clearRect(0, 0, canvas.width, canvas.height);
+
+    // 画面外に落ちたパーティクルはリサイクルせず消滅
+    particles = particles.filter(p => p.y <= canvas.height + 30);
+
+    // すべて落ち切ったら完全停止（ループ終了・メモリ解放）
+    if (particles.length === 0) {
+      stopConfetti();
+      return;
+    }
+
     particles.forEach(p => {
       p.y += p.vy;
       p.x += p.vx;
@@ -1253,21 +1308,32 @@ function startConfetti() {
       ctx.fillStyle = p.color;
       ctx.fillRect(-p.w / 2, -p.h / 2, p.w, p.h);
       ctx.restore();
-
-      if (p.y > canvas.height) {
-        p.y = -20;
-        p.x = Math.random() * canvas.width;
-      }
     });
+
     confettiReq = requestAnimationFrame(loop);
   }
   loop();
+
+  // 最大2.8秒で強制クリーンアップ（タイマーガード）
+  confettiTimer = setTimeout(() => {
+    stopConfetti();
+  }, 2800);
 }
 
+// 紙吹雪の完全停止とメモリクリーンアップ
 function stopConfetti() {
-  if (confettiReq) cancelAnimationFrame(confettiReq);
-  confettiReq = null;
-  ctx.clearRect(0, 0, canvas.width, canvas.height);
+  if (confettiReq) {
+    cancelAnimationFrame(confettiReq);
+    confettiReq = null;
+  }
+  if (confettiTimer) {
+    clearTimeout(confettiTimer);
+    confettiTimer = null;
+  }
+  particles = [];
+  if (ctx && canvas) {
+    ctx.clearRect(0, 0, canvas.width, canvas.height);
+  }
 }
 </script>
 
