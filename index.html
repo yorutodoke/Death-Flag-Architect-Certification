@@ -455,6 +455,11 @@
     line-height: 1.1;
     margin-bottom: 6px;
     text-shadow: 0 0 25px currentColor;
+    animation: rankReveal 0.7s 0.2s both cubic-bezier(0.2, 1.6, 0.4, 1);
+  }
+  @keyframes rankReveal {
+    from { opacity: 0; transform: scale(0.55) rotate(-8deg); }
+    to { opacity: 1; transform: scale(1) rotate(0); }
   }
   .rank-title {
     font-size: 1.25rem;
@@ -825,6 +830,49 @@ function playDullSound() {
   } catch(e) {}
 }
 
+// 結果表示のきらめき音
+function playSparkleSound() {
+  if (!soundEnabled || !audioCtx) return;
+  try {
+    const t = audioCtx.currentTime;
+    [1046.5, 1568].forEach((freq, i) => {
+      const osc = audioCtx.createOscillator();
+      const gain = audioCtx.createGain();
+      osc.type = 'sine';
+      osc.frequency.setValueAtTime(freq, t + i * 0.11);
+      gain.gain.setValueAtTime(0.0001, t + i * 0.11);
+      gain.gain.linearRampToValueAtTime(0.12, t + i * 0.11 + 0.015);
+      gain.gain.exponentialRampToValueAtTime(0.001, t + i * 0.11 + 0.32);
+      osc.connect(gain);
+      gain.connect(audioCtx.destination);
+      osc.start(t + i * 0.11);
+      osc.stop(t + i * 0.11 + 0.34);
+    });
+  } catch(e) {}
+}
+
+// 判定中の短い電子ドラムロール
+function playDrumRollSound() {
+  if (!soundEnabled || !audioCtx) return;
+  try {
+    const start = audioCtx.currentTime;
+    for (let i = 0; i < 9; i++) {
+      const t = start + i * 0.09;
+      const osc = audioCtx.createOscillator();
+      const gain = audioCtx.createGain();
+      osc.type = 'triangle';
+      osc.frequency.setValueAtTime(110 + i * 9, t);
+      gain.gain.setValueAtTime(0.0001, t);
+      gain.gain.linearRampToValueAtTime(0.12, t + 0.008);
+      gain.gain.exponentialRampToValueAtTime(0.001, t + 0.065);
+      osc.connect(gain);
+      gain.connect(audioCtx.destination);
+      osc.start(t);
+      osc.stop(t + 0.07);
+    }
+  } catch(e) {}
+}
+
 /* ========================================================
    2. 設問データ（厳選全8問・各設問4択）
    ======================================================== */
@@ -1077,6 +1125,7 @@ function chooseOption(btnIdx, score) {
 
 // 判定中のドラムロール演出
 function startEvaluation() {
+  playDrumRollSound();
   document.getElementById('progressFill').style.width = '100%';
   document.getElementById('quizScreen').style.display = 'none';
   document.getElementById('evaluatingScreen').style.display = 'block';
@@ -1092,9 +1141,10 @@ function showResult() {
   currentResultObj = result;
 
   // サウンド再生＆紙吹雪
+  playSparkleSound();
+  startConfetti();
   if (result.rank === 'RANK A' || result.rank === 'RANK B') {
     playFanfareSound();
-    startConfetti();
   } else if (result.rank === '何しに来た？' || result.rank === 'RANK F') {
     playDullSound();
   }
@@ -1249,7 +1299,7 @@ function showToast(msg) {
 }
 
 /* ========================================================
-   4. 紙吹雪パーティクル (ワンショット・軽量・残骸ゼロ設計)
+   4. 紙吹雪パーティクル (バースト→自然落下・1秒で生成停止)
    ======================================================== */
 let confettiReq = null;
 let confettiTimer = null;
@@ -1270,15 +1320,15 @@ function startConfetti() {
   particles = [];
 
   const colors = ['#ff3355', '#ffb82e', '#ff9436', '#ffffff', '#ffd700'];
-  // 最初に画面上部に一斉配置（60個の軽量バースト）
-  for (let i = 0; i < 60; i++) {
+  // 最初に画面上部に一斉配置（控えめなバースト）
+  for (let i = 0; i < 28; i++) {
     particles.push({
       x: Math.random() * canvas.width,
-      y: Math.random() * -canvas.height * 0.35,
-      w: Math.random() * 8 + 5,
-      h: Math.random() * 8 + 5,
+      y: Math.random() * -canvas.height * 0.5,
+      w: Math.random() * 9 + 5,
+      h: Math.random() * 9 + 5,
       color: colors[Math.floor(Math.random() * colors.length)],
-      vy: Math.random() * 3 + 2.5,
+      vy: Math.random() * 3 + 2,
       vx: (Math.random() - 0.5) * 2,
       rot: Math.random() * 360,
       vrot: (Math.random() - 0.5) * 8
@@ -1293,7 +1343,8 @@ function startConfetti() {
 
     // すべて落ち切ったら完全停止（ループ終了・メモリ解放）
     if (particles.length === 0) {
-      stopConfetti();
+      confettiReq = null;
+      ctx.clearRect(0, 0, canvas.width, canvas.height);
       return;
     }
 
@@ -1314,13 +1365,15 @@ function startConfetti() {
   }
   loop();
 
-  // 最大2.8秒で強制クリーンアップ（タイマーガード）
+  // 1秒後：新規生成を止めるだけ。既存パーティクルはそのまま落下継続
+  // ※ stopConfetti()は呼ばない → particles & ループはそのまま継続
   confettiTimer = setTimeout(() => {
-    stopConfetti();
-  }, 2800);
+    confettiTimer = null;
+    // 何もしない。ループが自然に全パーティクルを落下させて自己終了する
+  }, 1000);
 }
 
-// 紙吹雪の完全停止とメモリクリーンアップ
+// 紙吹雪の完全停止とメモリクリーンアップ（手動リセット用）
 function stopConfetti() {
   if (confettiReq) {
     cancelAnimationFrame(confettiReq);
